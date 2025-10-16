@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  publisher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: publisher
+    environment:
+      - INTERVAL_SEC=60
+    restart: unless-stopped
+
+  subscriber:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: subscriber
+    command: ["python", "-u", "subscriber.py"]
+    environment:
+      - TOPIC=sensors.temperature
+    depends_on:
+      - publisher
+    restart: unless-stopped
+  subscriber2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: subscriber2
+    command: ["python", "-u", "subscriber.py"]
+    environment:
+      - SUB_ID=sub-2
+      - TOPIC=sensors.humidity
+    depends_on:
+      - publisher
+    restart: unless-stopped
+
+  subscriber3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: subscriber3
+    command: ["python", "-u", "subscriber.py"]
+    environment:
+      - SUB_ID=sub-3
+      # subscribe to all sensors topics
+      - TOPIC=sensors
+    depends_on:
+      - publisher
+    restart: unless-stopped
